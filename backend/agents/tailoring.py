@@ -1,10 +1,18 @@
 
 import os
-from crewai import Agent, Task, Crew
+from crewai import Agent, Task, Crew, LLM
 from dotenv import load_dotenv
 from schemas.contracts import ScraperOutput, TailoringDraft, TailoredExperience
 
 load_dotenv()
+
+# ── GROQ LLM SETUP ────────────────────────────────────────────────────────────
+
+groq_llm = LLM(
+    model="groq/llama-3.3-70b-versatile",
+    api_key=os.getenv("GROQ_API_KEY"),
+    temperature=0.7
+)
 
 # ── MOCK DATA ────
 
@@ -74,6 +82,7 @@ tailoring_agent = Agent(
     helping engineers land jobs at top tech companies. You are known for your 
     ability to reframe existing experience powerfully — and your strict refusal 
     to ever fabricate credentials.""",
+    llm=groq_llm,   
     verbose=True,
     allow_delegation=False,
 )
@@ -173,7 +182,15 @@ Fix the issues above in your rewrite. Do not repeat the same mistakes.
     crew = Crew(agents=[tailoring_agent], tasks=[task])
     result = crew.kickoff()
 
-    return TailoringDraft.model_validate_json(result.raw)
+    # Strip markdown code fences if present (LLM sometimes ignores the "no markdown" instruction)
+    raw_json = result.raw.strip()
+    if raw_json.startswith("```"):
+        raw_json = raw_json.split("```")[1]  # Extract content between fences
+        if raw_json.startswith("json"):
+            raw_json = raw_json[4:]  # Remove "json" language tag
+        raw_json = raw_json.strip()
+    
+    return TailoringDraft.model_validate_json(raw_json)
 
 
 # ── QUICK TEST ────────────────────────────────────────────────────────────────

@@ -1,11 +1,19 @@
 # agents/critic.py
 
 import os
-from crewai import Agent, Task, Crew
+from crewai import Agent, Task, Crew, LLM
 from dotenv import load_dotenv
 from schemas.contracts import ScraperOutput, TailoringDraft, CriticReport
 
 load_dotenv()
+
+# ── GROQ LLM SETUP ────────────────────────────────────────────────────────────
+
+groq_llm = LLM(
+    model="groq/llama-3.3-70b-versatile",
+    api_key=os.getenv("GROQ_API_KEY"),
+    temperature=0.7
+)
 
 # ── SYSTEM PROMPT ─────────────────────────────────────────────────────────────
 
@@ -93,6 +101,7 @@ critic_agent = Agent(
     systems. You have reviewed thousands of resumes and have a sharp eye for 
     exaggerated or fabricated claims. You are the last line of defense before 
     a resume reaches a hiring manager.""",
+    llm=groq_llm,
     verbose=True,
     allow_delegation=False,
 )
@@ -162,7 +171,15 @@ def run_critic_agent(
     crew = Crew(agents=[critic_agent], tasks=[task])
     result = crew.kickoff()
 
-    report = CriticReport.model_validate_json(result.raw)
+    # Strip markdown code fences if present (LLM sometimes ignores the "no markdown" instruction)
+    raw_json = result.raw.strip()
+    if raw_json.startswith("```"):
+        raw_json = raw_json.split("```")[1]  # Extract content between fences
+        if raw_json.startswith("json"):
+            raw_json = raw_json[4:]  # Remove "json" language tag
+        raw_json = raw_json.strip()
+    
+    report = CriticReport.model_validate_json(raw_json)
     report.revision_count = revision_count
     return report
 

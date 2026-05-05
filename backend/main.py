@@ -5,12 +5,13 @@ from schemas.contracts import ScraperOutput, TailoringDraft, CriticReport
 from tools.scraper import scrape_job_description
 from agents.tailoring import run_tailoring_agent, MOCK_SCRAPER_OUTPUT, MOCK_ORIGINAL_RESUME_BULLETS
 from agents.critic import run_critic_agent
+from tools.pdf_parser import parse_resume_pdf
 
 load_dotenv()
 
 
 MAX_RETRIES = 3
-USE_MOCK = True  
+USE_MOCK = False
 
 
 
@@ -128,10 +129,20 @@ def run_pipeline(
     }
 
 
-# ── ENTRY POINT ───────────────────────────────────────────────────────────────
+
 
 if __name__ == "__main__":
+    # 1. Define your inputs
+    test_pdf_path = "/Users/satakshi/Downloads/Resume-Sample-2.pdf"
+    test_job_url = "https://jobs.apple.com/en-us/details/200547076/ios-engineer"
+
+    # 2. Extract the real bullets from the PDF!
+    # (Make sure use_mock=False so it actually reads your file)
+    print("\n📄 Extracting Original Resume...")
+    extracted_bullets = parse_resume_pdf(test_pdf_path, use_mock=False)
+
+    # 3. Pass the REAL bullets into the pipeline
     result = run_pipeline(
-        jd_url="https://jobs.apple.com/en-us/details/200547076/ios-engineer",
-        original_bullets=MOCK_ORIGINAL_RESUME_BULLETS,
+        jd_url=test_job_url,
+        original_bullets=extracted_bullets,
     )
