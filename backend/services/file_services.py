@@ -103,5 +103,6 @@ async def validate_and_save(file: UploadFile, doc_type: str) -> dict:
         "size_mb": size_mb,
         "mime_type": mime_type,
         "saved_path": save_path,
-        "page_count": page_count
+        "page_count": page_count,
+        "content": content 
     }

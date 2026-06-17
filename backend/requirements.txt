@@ -4,3 +4,6 @@ python-multipart
 python-magic
 aiofiles
 pdfplumber
+PyMuPDF
+pytesseract
+Pillow
