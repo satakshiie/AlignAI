@@ -34,4 +34,5 @@ async def upload_document(
         extraction_method=extraction_result["method"],
         char_count=extraction_result["char_count"],
         extracted_text=extraction_result["text"]
+        
     )

@@ -7,3 +7,5 @@ pdfplumber
 PyMuPDF
 pytesseract
 Pillow
+spacy
+phonenumbers
