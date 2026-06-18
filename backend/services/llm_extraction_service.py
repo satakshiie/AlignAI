@@ -77,9 +77,10 @@ Extract the following and return ONLY valid JSON, no preamble, no markdown forma
 
 Rules:
 - If a field has no information available, use null (for strings) or an empty list (for arrays) — never omit the key.
-- The "skills" list should only include skills that are explicitly stated in the resume text. Do not infer or add skills that are not directly mentioned.
+- The "summary" field must be the candidate's own written summary/objective statement, copied or lightly cleaned from the resume text — never write one yourself. If no summary, objective, or "about me" section exists anywhere in the resume, set "summary" to null. Do not synthesize a summary by combining details from skills, experience, or projects — that counts as fabrication and is strictly forbidden.
+- The "skills" list should include every technology, language, framework, or tool explicitly named anywhere in the resume — including inside experience bullets and project descriptions, not only the dedicated Skills section. Do not infer or add skills that are not directly named as text anywhere in the resume.
 - Each distinct project under a "Projects" heading should be its own object in the projects array, even if they were grouped under one section in the pre-segmented input.
-- A short proper-noun-like word or phrase immediately followed by "Role:" and a tech stack description is a PROJECT TITLE, not a certification — certifications are formal credential names (e.g. "AWS Certified", "Azure AI Fundamentals"), not single-word project names. If you see a short word followed by "Role: [job title] | Tech: [technologies]", that word is the project's "title" field — do not place it in certifications.
+- A short proper-noun-like word or phrase immediately followed by "Role:" and a tech stack description is a PROJECT TITLE, not a certification. Certifications are formal credential names (e.g. "AWS Certified Developer", "Azure AI Fundamentals") — never a single standalone word followed by "Role: [job title] | Tech: [technologies]". If you see that pattern, the preceding word or phrase belongs in the project's "title" field, not in certifications.
 - Do not fabricate company names, dates, or institutions that are not present in the text.
 """
     return prompt

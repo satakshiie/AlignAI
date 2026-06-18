@@ -3,7 +3,7 @@ from services.extraction_service import extract_text
 from services.deterministic_extraction_service import extract_deterministic_fields
 from services.llm_extraction_service import extract_resume_data
 
-with open("/Users/satakshi/Downloads/SatakshiS_resume.pdf", "rb") as f:
+with open("/Users/satakshi/Downloads/resume_test.pdf", "rb") as f:
     file_content = f.read()
 
 extraction_result = extract_text(file_content)
