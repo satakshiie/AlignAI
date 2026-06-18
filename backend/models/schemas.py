@@ -1,6 +1,6 @@
 from pydantic import BaseModel
-from pydantic import BaseModel
 from enum import Enum
+from typing import Any
 
 
 class DocType(str, Enum):
@@ -18,3 +18,5 @@ class UploadResponse(BaseModel):
     extraction_method: str
     char_count: int
     extracted_text: str
+    deterministic_fields: dict[str, Any]   # name, email, phone, dates, sections, links
+    parsed_data: dict[str, Any]            # the LLM-structured output (resume or JD shape)

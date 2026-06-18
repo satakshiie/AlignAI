@@ -1,26 +1,26 @@
 import json
-from groq import Groq
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
+from groq import Groq
 
-client = Groq()  # assumes GROQ_API_KEY is already set in your environment, same as Kamalam
+client = Groq()  # assumes GROQ_API_KEY is already set in your environment
 
 MODEL = "llama-3.3-70b-versatile"
 
 
+# ============================================================
+# RESUME EXTRACTION
+# ============================================================
+
 def build_extraction_prompt(sections: dict, raw_text: str, extraction_method: str) -> str:
     """
     Builds the prompt for resume parsing. Sections from Phase 1 are passed
-    as the primary structured input. Raw text is included as fallback
-    context — useful when a section came back empty (e.g. "education")
-    due to PDF reading-order quirks, since the LLM can still find that
-    content in the raw text even if Phase 1's splitter missed it.
+    as primary structured input. Raw text is fallback context for cases
+    where a section came back empty due to PDF reading-order quirks.
     """
 
-    # Only mention OCR caveats if this document actually went through OCR —
-    # no need to prime the model to expect noise in a clean text extraction
     ocr_note = ""
     if extraction_method == "tesseract_ocr":
         ocr_note = (
@@ -89,35 +89,108 @@ Rules:
 def extract_resume_data(sections: dict, raw_text: str, extraction_method: str) -> dict:
     """
     Calls the LLM to extract structured resume data.
-    Returns a dict with success status and either the parsed data or an error.
     """
-
     prompt = build_extraction_prompt(sections, raw_text, extraction_method)
 
     try:
         response = client.chat.completions.create(
             model=MODEL,
             messages=[{"role": "user", "content": prompt}],
-            temperature=0.1,  # low temperature — we want consistent, literal extraction, not creativity
-            response_format={"type": "json_object"}  # forces valid JSON output from Groq
+            temperature=0.1,
+            response_format={"type": "json_object"}
         )
 
         raw_output = response.choices[0].message.content
         parsed = json.loads(raw_output)
 
-        return {
-            "success": True,
-            "data": parsed
-        }
+        return {"success": True, "data": parsed}
 
     except json.JSONDecodeError as e:
-        return {
-            "success": False,
-            "error": f"LLM returned invalid JSON: {str(e)}"
-        }
+        return {"success": False, "error": f"LLM returned invalid JSON: {str(e)}"}
 
     except Exception as e:
-        return {
-            "success": False,
-            "error": f"LLM extraction failed: {str(e)}"
-        }
+        return {"success": False, "error": f"LLM extraction failed: {str(e)}"}
+
+
+# ============================================================
+# JOB DESCRIPTION EXTRACTION
+# ============================================================
+
+def build_jd_extraction_prompt(sections: dict, raw_text: str, extraction_method: str) -> str:
+    """
+    Builds the prompt for job description parsing. Structurally different
+    from resume extraction — a JD describes role requirements, not a
+    person's history, so the schema separates required vs preferred
+    skills rather than using one flat skills list.
+    """
+
+    ocr_note = ""
+    if extraction_method == "tesseract_ocr":
+        ocr_note = (
+            "\nNote: this text was extracted via OCR and may contain minor "
+            "character recognition errors. Use context to infer the correct "
+            "intended word or value when extracting fields.\n"
+        )
+
+    prompt = f"""You are a job description parsing assistant. Extract structured information from the job description below.
+
+The JD has been pre-segmented into sections, but section boundaries may be imperfect.
+Use the raw text as a fallback reference if a section seems incomplete or empty.
+{ocr_note}
+PRE-SEGMENTED SECTIONS:
+{json.dumps(sections, indent=2)}
+
+RAW TEXT (fallback reference):
+{raw_text}
+
+Extract the following and return ONLY valid JSON, no preamble, no markdown formatting, no explanation:
+
+{{
+  "job_title": "string or null",
+  "company": "string or null",
+  "seniority_level": "one of: entry, mid, senior, lead, not specified",
+  "employment_type": "one of: full-time, part-time, internship, contract, not specified",
+  "required_skills": ["list of skills explicitly marked as required/must-have"],
+  "preferred_skills": ["list of skills explicitly marked as preferred/nice-to-have/bonus"],
+  "responsibilities": ["list of distinct responsibility/duty strings"],
+  "qualifications": ["list of distinct qualification requirements, e.g. degree, years of experience"],
+  "ats_keywords": ["list of important domain-specific terms and tools mentioned, useful for ATS keyword matching"]
+}}
+
+Rules:
+- If a field has no information available, use null (for strings) or an empty list (for arrays) — never omit the key.
+- Only include a skill in "required_skills" if the text explicitly signals it as mandatory (e.g. listed under "Requirements", "Must have", or stated directly as required). Do not guess.
+- Only include a skill in "preferred_skills" if the text explicitly signals it as optional/bonus (e.g. listed under "Nice to have", "Preferred", "Bonus points").
+- If a skill's required/preferred status is genuinely ambiguous from context, default to "required_skills" rather than omitting it, but never duplicate the same skill in both lists.
+- "ats_keywords" should include skills, tools, certifications, and domain terms mentioned anywhere in the JD — this list may overlap with required/preferred skills, that's expected.
+- Do not fabricate a company name, job title, or seniority level that isn't stated or strongly implied by the text. If seniority isn't mentioned or implied by job title (e.g. "Senior Engineer"), use "not specified".
+- Do not invent responsibilities or qualifications not present in the text.
+"""
+    return prompt
+
+
+def extract_jd_data(sections: dict, raw_text: str, extraction_method: str) -> dict:
+    """
+    Calls the LLM to extract structured JD data. Mirrors extract_resume_data()
+    but uses the JD-specific prompt and schema.
+    """
+    prompt = build_jd_extraction_prompt(sections, raw_text, extraction_method)
+
+    try:
+        response = client.chat.completions.create(
+            model=MODEL,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.1,
+            response_format={"type": "json_object"}
+        )
+
+        raw_output = response.choices[0].message.content
+        parsed = json.loads(raw_output)
+
+        return {"success": True, "data": parsed}
+
+    except json.JSONDecodeError as e:
+        return {"success": False, "error": f"LLM returned invalid JSON: {str(e)}"}
+
+    except Exception as e:
+        return {"success": False, "error": f"LLM extraction failed: {str(e)}"}
