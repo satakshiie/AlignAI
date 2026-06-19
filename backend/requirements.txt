@@ -67,3 +67,4 @@ psycopg2-binary
 alembic
 python-dotenv
 rapidfuzz
+scikit-learn
