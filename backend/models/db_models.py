@@ -1,9 +1,40 @@
 import uuid
-from sqlalchemy import Column, String, Float, Integer, Text, DateTime, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID, JSONB
+import hashlib
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from database import Base
+from sqlalchemy import Column, String, Float, Integer, Text, DateTime, Date, ForeignKey
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 
+
+class UsageLog(Base):
+    """
+    Tracks daily usage per identifier (IP address for now, swappable
+    for a real user_id once auth exists). One row per identifier per day —
+    incremented, not appended, to keep this table small and fast to query.
+    """
+    __tablename__ = "usage_log"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    identifier = Column(String, nullable=False)   # IP address hash, or future user_id
+    usage_date = Column(Date, nullable=False, server_default=func.current_date())
+    full_runs_count = Column(Integer, nullable=False, default=0)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class ResultCache(Base):
+    """
+    Caches the full ATS/tailoring output for a given resume+JD pair,
+    keyed by a hash of both documents' content. If the same pair is
+    scored again with no changes, we return the cached result instead
+    of re-calling the LLM at all.
+    """
+    __tablename__ = "result_cache"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    cache_key = Column(String, nullable=False, unique=True, index=True)
+    result_data = Column(Text, nullable=False)  # JSON-serialized result
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 class Document(Base):
     """

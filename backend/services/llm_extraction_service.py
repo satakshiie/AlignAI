@@ -164,6 +164,7 @@ Rules:
 - If a skill's required/preferred status is genuinely ambiguous from context, default to "required_skills" rather than omitting it, but never duplicate the same skill in both lists.
 - "ats_keywords" should include skills, tools, certifications, and domain terms mentioned anywhere in the JD — this list may overlap with required/preferred skills, that's expected.
 - Do not fabricate a company name, job title, or seniority level that isn't stated or strongly implied by the text. If seniority isn't mentioned or implied by job title (e.g. "Senior Engineer"), use "not specified".
+- "required_skills" and "preferred_skills" must each be SHORT, ATOMIC skill or competency names (1-4 words each, e.g. "communication skills", "Python", "team management") — never full sentences or requirement descriptions. If a requirement is phrased as a full sentence in the JD (e.g. "must have at least 2 years of experience managing a team"), extract just the core skill/competency from it (e.g. "team management experience") rather than copying the full sentence.
 - Do not invent responsibilities or qualifications not present in the text.
 """
     return prompt

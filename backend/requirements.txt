@@ -68,3 +68,5 @@ alembic
 python-dotenv
 rapidfuzz
 scikit-learn
+langgraph
+langchain-groq
