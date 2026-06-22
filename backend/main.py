@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers.upload import router as upload_router
 from routers.ats import router as ats_router
+from routers.tailoring import router as tailoring_router
 
 app = FastAPI(title="AlignAI API")
 
@@ -15,6 +16,7 @@ app.add_middleware(
 
 app.include_router(upload_router)
 app.include_router(ats_router)
+app.include_router(tailoring_router)
 
 
 @app.get("/health")
