@@ -37,7 +37,7 @@ class TailorResumeResponse(BaseModel):
     learning_roadmap: list[dict[str, Any]]
     summary: str
 
-    
+
 class DocType(str, Enum):
     resume = "resume"
     jd = "jd"
@@ -49,6 +49,7 @@ class UploadResponse(BaseModel):
     filename: str
     size_mb: float
     mime_type: str
+    document_id: UUID
     message: str
     extraction_method: str
     char_count: int

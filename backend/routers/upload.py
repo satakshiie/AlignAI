@@ -7,6 +7,7 @@ from services.extraction_service import extract_text
 from services.deterministic_extraction_service import extract_deterministic_fields, categorize_links
 from services.llm_extraction_service import extract_resume_data, extract_jd_data
 from services.storage_service import save_document_and_context
+from services.doc_type_heuristic import guess_doc_type, DocTypeGuess
 
 router = APIRouter(prefix="/api", tags=["upload"])
 
@@ -22,6 +23,23 @@ async def upload_document(
     extraction_result = extract_text(result["content"])
     if not extraction_result["success"]:
         raise HTTPException(status_code=422, detail=extraction_result["error"])
+
+    # --- Content-based doc_type mismatch check ---
+    # Runs immediately after text extraction, before any LLM/deterministic work,
+    # so it costs nothing extra. UNDETECTED means the heuristic wasn't confident
+    # enough to block — we let those through rather than risk false positives.
+    guessed_type = guess_doc_type(extraction_result["text"])
+    if guessed_type != DocTypeGuess.UNDETECTED:
+        if doc_type == DocType.resume and guessed_type == DocTypeGuess.JD:
+            raise HTTPException(
+                status_code=400,
+                detail="This doesn't look like a resume — it looks like a job description. Please check the file and try again."
+            )
+        if doc_type == DocType.jd and guessed_type == DocTypeGuess.RESUME:
+            raise HTTPException(
+                status_code=400,
+                detail="This looks like a resume, not a job description. Please upload the correct file."
+            )
 
     deterministic = extract_deterministic_fields(
         extraction_result["text"], doc_type.value, extraction_result["hyperlinks"]
@@ -62,6 +80,7 @@ async def upload_document(
         filename=result["filename"],
         size_mb=result["size_mb"],
         mime_type=result["mime_type"],
+        document_id=save_result["document_id"], 
         message=f"{doc_type.value} uploaded, validated, parsed, and saved successfully.",
         extraction_method=extraction_result["method"],
         char_count=extraction_result["char_count"],
