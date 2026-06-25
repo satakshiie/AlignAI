@@ -1,17 +1,34 @@
 import React, { useState } from 'react';
 import './App.css';
 import UploadScreen from './components/UploadScreen';
+import ScoreScreen from './components/ScoreScreen';
+
+// Screen names for the flow
+const SCREENS = {
+  LANDING: 'landing',
+  UPLOAD: 'upload',
+  SCORE: 'score',
+};
 
 function App() {
-  const [started, setStarted] = useState(false);
+  const [screen, setScreen] = useState(SCREENS.LANDING);
+  const [documentIds, setDocumentIds] = useState({
+    resumeDocumentId: null,
+    jdDocumentId: null,
+  });
 
-  const handleUploadComplete = (data) => {
-    console.log('Upload complete! Data:', data);
-    alert('Upload complete! Check console for data.');
-    // Here we would typically route to the next screen (e.g. ATS scoring)
+  const handleUploadComplete = ({ resumeDocumentId, jdDocumentId }) => {
+    setDocumentIds({ resumeDocumentId, jdDocumentId });
+    setScreen(SCREENS.SCORE);
   };
 
-  if (started) {
+  const handleScoreContinue = ({ resumeDocumentId, jdDocumentId }) => {
+    // Next screen (tailoring) will be wired here
+    console.log('Continuing to tailoring with:', { resumeDocumentId, jdDocumentId });
+    alert('Tailoring screen coming soon!');
+  };
+
+  if (screen === SCREENS.UPLOAD) {
     return (
       <div className="app-container" style={{ alignItems: 'flex-start', paddingTop: '4rem' }}>
         <div className="glow"></div>
@@ -22,27 +39,43 @@ function App() {
     );
   }
 
+  if (screen === SCREENS.SCORE) {
+    return (
+      <div className="app-container" style={{ alignItems: 'flex-start', paddingTop: '4rem' }}>
+        <div className="glow"></div>
+        <div className="content" style={{ width: '100%' }}>
+          <ScoreScreen
+            resumeDocumentId={documentIds.resumeDocumentId}
+            jdDocumentId={documentIds.jdDocumentId}
+            onContinue={handleScoreContinue}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // LANDING
   return (
     <div className="app-container">
       <div className="glow"></div>
-      
+
       <div className="content">
         <div className="badge">✨ AlignAI Frontend Scaffolded</div>
-        
+
         <h1 className="title">
           Build the future of <br />
           <span>Alignment</span>
         </h1>
-        
+
         <p className="subtitle">
-          Your React + Vite application is successfully set up and ready for development. 
+          Your React + Vite application is successfully set up and ready for development.
           Start building powerful, aligned AI interfaces with premium aesthetics.
         </p>
-        
-        <button className="cta-button" onClick={() => setStarted(true)}>
+
+        <button className="cta-button" onClick={() => setScreen(SCREENS.UPLOAD)}>
           Start Flow
         </button>
-        
+
         <div className="features">
           <div className="feature-card">
             <div className="feature-icon">⚡️</div>
