@@ -3,15 +3,17 @@ import json
 from sqlalchemy.orm import Session
 from models.db_models import ResultCache
 
+PIPELINE_VERSION = "v2"
+
 
 def compute_cache_key(resume_text: str, jd_text: str) -> str:
     """
-    Builds a stable cache key from both documents' raw text. If either
-    document changes even slightly (different resume version, different
-    JD), the hash changes and we correctly treat it as a new request —
-    no stale cache hits on genuinely different content.
+    Builds a stable cache key from both documents' raw text AND the current
+    pipeline version. Bumping PIPELINE_VERSION invalidates all old cache
+    entries at once, since prompt changes can produce meaningfully different
+    output even for identical input documents.
     """
-    combined = f"{resume_text.strip()}||{jd_text.strip()}"
+    combined = f"{PIPELINE_VERSION}||{resume_text.strip()}||{jd_text.strip()}"
     return hashlib.sha256(combined.encode()).hexdigest()
 
 

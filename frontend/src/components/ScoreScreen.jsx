@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 export default function ScoreScreen({ resumeDocumentId, jdDocumentId, onContinue }) {
   const [scoreData, setScoreData] = useState(null);
+  const hasStarted = useRef(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -43,6 +44,9 @@ export default function ScoreScreen({ resumeDocumentId, jdDocumentId, onContinue
         setLoading(false);
       }
     };
+
+    if (hasStarted.current) return;
+    hasStarted.current = true;
 
     fetchScore();
   }, [resumeDocumentId, jdDocumentId]);

@@ -54,6 +54,15 @@ CRITICAL RULES:
 - A skill being "related" to other skills is not enough — there must be a clear, specific,
   defensible connection (e.g. "iOS" is implied by "Swift" + "SwiftUI" + "Xcode" + an "iOS Developer"
   job title — that's a strong, specific connection, not a vague one).
+  - Be especially skeptical of vague, generic soft-skill claims like "problem solving," 
+  "communication," "teamwork," "leadership," or "attention to detail." These skills can 
+  be loosely connected to almost ANY engineering bullet, which makes that kind of 
+  connection too weak to count as grounding. For a soft skill to be classified as 
+  "implied," the resume must contain a SPECIFIC, NAMED instance of that skill being 
+  demonstrated — e.g. a bullet that explicitly describes overcoming a particular obstacle, 
+  not just "engineered X" or "designed Y" in isolation. If the only available grounding 
+  is a list of generic engineering bullets with no specific obstacle or challenge 
+  described, classify the skill as "true_gap" instead, with confidence no higher than 0.6.
 
 CANDIDATE'S LISTED SKILLS:
 {json.dumps(resume_skills)}

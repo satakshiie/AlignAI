@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import './App.css';
 import UploadScreen from './components/UploadScreen';
 import ScoreScreen from './components/ScoreScreen';
+import TailorScreen from './components/TailorScreen';
 
 // Screen names for the flow
 const SCREENS = {
   LANDING: 'landing',
   UPLOAD: 'upload',
   SCORE: 'score',
+  TAILOR: 'tailor',
 };
 
 function App() {
@@ -23,9 +25,8 @@ function App() {
   };
 
   const handleScoreContinue = ({ resumeDocumentId, jdDocumentId }) => {
-    // Next screen (tailoring) will be wired here
-    console.log('Continuing to tailoring with:', { resumeDocumentId, jdDocumentId });
-    alert('Tailoring screen coming soon!');
+    setDocumentIds({ resumeDocumentId, jdDocumentId });
+    setScreen(SCREENS.TAILOR);
   };
 
   if (screen === SCREENS.UPLOAD) {
@@ -48,6 +49,20 @@ function App() {
             resumeDocumentId={documentIds.resumeDocumentId}
             jdDocumentId={documentIds.jdDocumentId}
             onContinue={handleScoreContinue}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (screen === SCREENS.TAILOR) {
+    return (
+      <div className="app-container" style={{ alignItems: 'flex-start', paddingTop: '4rem' }}>
+        <div className="glow"></div>
+        <div className="content" style={{ width: '100%' }}>
+          <TailorScreen
+            resumeDocumentId={documentIds.resumeDocumentId}
+            jdDocumentId={documentIds.jdDocumentId}
           />
         </div>
       </div>
