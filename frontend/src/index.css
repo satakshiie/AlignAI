@@ -1,30 +1,41 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
+/* ── Design tokens ─────────────────────────────────────────────── */
 :root {
-  --bg-primary: #050505;
-  --bg-secondary: #111111;
-  --text-primary: #ffffff;
-  --text-secondary: #a1a1aa;
-  --accent-color: #8b5cf6;
-  --accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.08);
-}
+  --navy:      #001233;
+  --ocean:     #094074;
+  --slate:     #37455E;
+  --mist:      #6E7788;
+  --silver:    #DFDFE0;
 
-body {
-  margin: 0;
+  --gradient-hero: linear-gradient(135deg, #001233 0%, #094074 55%, #37455E 100%);
+  --gradient-glow: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(9,64,116,0.7) 0%, transparent 70%);
+  --gradient-accent: linear-gradient(90deg, #094074, #6E7788, #094074);
+  --gradient-btn: linear-gradient(135deg, #094074 0%, #37455E 100%);
+  --gradient-text: linear-gradient(135deg, #DFDFE0 0%, #6E7788 50%, #DFDFE0 100%);
+
   font-family: 'Inter', sans-serif;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Reset ─────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--navy);
+  color: var(--silver);
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  overflow-x: hidden;
 }
 
 #root {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
 }
+
+/* ── Scrollbar ─────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--navy); }
+::-webkit-scrollbar-thumb { background: var(--slate); border-radius: 3px; }

@@ -1,0 +1,658 @@
+/* ── LandingPage.css ─────────────────────────────────────────────────────── */
+
+/* ═══ Page shell ══════════════════════════════════════════════════════════════ */
+.landing {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #001233;
+}
+
+/* ═══ Split background ════════════════════════════════════════════════════════
+   Desktop: left panel stays deep navy, right panel shifts to ocean/slate.
+   A diagonal cut divides them, with an animated glow along the seam.
+   Mobile: full-page gradient (single column, no split needed).
+══════════════════════════════════════════════════════════════════════════════ */
+.landing__bg-left {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(160deg, #000d22 0%, #001233 45%, #061e40 100%);
+  background-size: 200% 200%;
+  animation: bgLeftPulse 14s ease infinite alternate;
+}
+
+@keyframes bgLeftPulse {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+
+/* Right-half overlay — desktop only, clips via clip-path */
+.landing__bg-right {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(145deg, #062344 0%, #094074 40%, #37455E 80%, #2a3549 100%);
+  background-size: 300% 300%;
+  animation: bgRightPulse 10s ease infinite alternate;
+  /* Diagonal cut: right side starts at ~52% across */
+  clip-path: polygon(54% 0%, 100% 0%, 100% 100%, 48% 100%);
+}
+
+@keyframes bgRightPulse {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+/* Glowing seam line along the diagonal cut */
+.landing__seam {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  /* A thin bright line that follows the same diagonal */
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(9, 64, 116, 0.0) 10%,
+    rgba(55, 200, 255, 0.18) 45%,
+    rgba(9, 64, 116, 0.0) 90%,
+    transparent 100%
+  );
+  clip-path: polygon(51% 0%, 53.5% 0%, 49.5% 100%, 47% 100%);
+  animation: seamGlow 4s ease-in-out infinite alternate;
+  filter: blur(2px);
+}
+
+@keyframes seamGlow {
+  0%   { opacity: 0.5; filter: blur(2px); }
+  100% { opacity: 1;   filter: blur(6px); }
+}
+
+/* ═══ Grid overlays — separate densities per side ═════════════════════════════ */
+.landing__grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Dense fine grid on right (tech/data side) */
+.landing__grid::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(110,119,136,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(110,119,136,0.07) 1px, transparent 1px);
+  background-size: 40px 40px;
+  clip-path: polygon(54% 0%, 100% 0%, 100% 100%, 48% 100%);
+}
+
+/* Looser atmospheric grid on left (content side) */
+.landing__grid::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(110,119,136,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(110,119,136,0.04) 1px, transparent 1px);
+  background-size: 80px 80px;
+  clip-path: polygon(0% 0%, 54% 0%, 48% 100%, 0% 100%);
+}
+
+/* ═══ Scanline overlay — futuristic CRT feel ═══════════════════════════════════ */
+.landing__scanlines {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0, 0, 0, 0.05) 3px,
+    rgba(0, 0, 0, 0.05) 4px
+  );
+}
+
+/* ═══ Floating glow orbs ═══════════════════════════════════════════════════════ */
+.landing__orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.landing__orb--1 {
+  width: 500px;
+  height: 500px;
+  top: -80px;
+  right: 5%;
+  background: radial-gradient(circle, rgba(9,64,116,0.5) 0%, transparent 70%);
+  animation: orbFloat1 20s ease-in-out infinite;
+}
+
+.landing__orb--2 {
+  width: 400px;
+  height: 400px;
+  bottom: -100px;
+  left: 5%;
+  background: radial-gradient(circle, rgba(0,18,51,0.7) 0%, transparent 70%);
+  animation: orbFloat2 24s ease-in-out infinite;
+}
+
+.landing__orb--3 {
+  width: 250px;
+  height: 250px;
+  top: 40%;
+  left: 48%;
+  background: radial-gradient(circle, rgba(9,64,116,0.35) 0%, transparent 70%);
+  animation: orbFloat3 16s ease-in-out infinite;
+}
+
+@keyframes orbFloat1 {
+  0%, 100% { transform: translate(0, 0); }
+  50%       { transform: translate(-40px, 50px); }
+}
+@keyframes orbFloat2 {
+  0%, 100% { transform: translate(0, 0); }
+  50%       { transform: translate(30px, -40px); }
+}
+@keyframes orbFloat3 {
+  0%, 100% { transform: translate(0, 0); opacity: 0.5; }
+  50%       { transform: translate(0, -20px); opacity: 0.9; }
+}
+
+/* ═══ Navigation ═══════════════════════════════════════════════════════════════ */
+.landing__nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 3rem;
+  background: rgba(0, 12, 30, 0.55);
+  backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(110,119,136,0.12);
+}
+
+.landing__nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #DFDFE0;
+}
+
+.landing__nav-logo-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #3a9fd8;
+  box-shadow: 0 0 12px rgba(58,159,216,0.9);
+  animation: dotPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(58,159,216,0.8); transform: scale(1); }
+  50%       { box-shadow: 0 0 22px rgba(58,159,216,1), 0 0 40px rgba(9,64,116,0.5); transform: scale(1.25); }
+}
+
+.landing__nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.landing__nav-tag {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #6E7788;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid rgba(110,119,136,0.22);
+  padding: 0.3rem 0.85rem;
+  border-radius: 100px;
+}
+
+/* ═══ Main two-column layout ════════════════════════════════════════════════════ */
+.landing__body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex: 1;
+  min-height: 100vh;
+  align-items: center;
+  padding-top: 5rem; /* clear fixed nav */
+}
+
+/* ── Left: text side ── */
+.landing__left {
+  flex: 0 0 52%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 4rem 5rem 4rem 6rem;
+  text-align: left;
+}
+
+/* ── Right: animation side ── */
+.landing__right {
+  flex: 0 0 48%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 3rem;
+  position: relative;
+}
+
+/* ═══ Badge ════════════════════════════════════════════════════════════════════ */
+.landing__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: 100px;
+  border: 1px solid rgba(58,159,216,0.25);
+  background: rgba(9,64,116,0.18);
+  backdrop-filter: blur(8px);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #6E7788;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 1.6rem;
+  animation: fadeSlideUp 0.7s ease both;
+}
+
+.landing__badge-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #3a9fd8;
+  box-shadow: 0 0 6px rgba(58,159,216,0.8);
+}
+
+/* ═══ Headline ════════════════════════════════════════════════════════════════ */
+.landing__headline {
+  font-size: clamp(2.8rem, 4.5vw, 5.2rem);
+  font-weight: 900;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  margin-bottom: 1.4rem;
+  animation: fadeSlideUp 0.7s ease 0.1s both;
+}
+
+.landing__headline-static {
+  display: block;
+  color: #DFDFE0;
+}
+
+.landing__headline-gradient {
+  display: block;
+  background: linear-gradient(
+    120deg,
+    #DFDFE0 0%,
+    #8ab8d8 25%,
+    #3a9fd8 45%,
+    #094074 65%,
+    #6E7788 85%,
+    #DFDFE0 100%
+  );
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation:
+    fadeSlideUp 0.7s ease 0.1s both,
+    shimmer 6s linear 1s infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 250% center; }
+  100% { background-position: -250% center; }
+}
+
+/* ═══ Description ══════════════════════════════════════════════════════════════ */
+.landing__desc {
+  max-width: 480px;
+  font-size: clamp(0.95rem, 1.2vw, 1.08rem);
+  font-weight: 400;
+  line-height: 1.75;
+  color: #6E7788;
+  margin-bottom: 2.5rem;
+  animation: fadeSlideUp 0.7s ease 0.2s both;
+}
+
+.landing__desc strong {
+  color: #b8cfe0;
+  font-weight: 600;
+}
+
+/* ═══ CTA group ════════════════════════════════════════════════════════════════ */
+.landing__cta-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: flex-start;
+  animation: fadeSlideUp 0.7s ease 0.3s both;
+}
+
+/* Primary button */
+.landing__cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.9rem 2rem;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #DFDFE0;
+  background: linear-gradient(135deg, #094074 0%, #0d5a9e 50%, #37455E 100%);
+  background-size: 200% 200%;
+  box-shadow:
+    0 0 0 1px rgba(58,159,216,0.2),
+    0 4px 28px rgba(9,64,116,0.6),
+    0 1px 0 rgba(223,223,224,0.08) inset;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-position 0.4s ease;
+  overflow: hidden;
+  animation: ctaBgShift 5s ease infinite;
+}
+
+@keyframes ctaBgShift {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+
+.landing__cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.1) 50%, transparent 80%);
+  background-size: 300% 100%;
+  background-position: -300% 0;
+  animation: btnSweep 4s ease 2s infinite;
+}
+
+@keyframes btnSweep {
+  0%   { background-position: -300% 0; }
+  100% { background-position: 300% 0; }
+}
+
+.landing__cta:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow:
+    0 0 0 1px rgba(58,159,216,0.4),
+    0 8px 40px rgba(9,64,116,0.8),
+    0 0 30px rgba(58,159,216,0.15);
+}
+
+.landing__cta:active { transform: translateY(-1px) scale(1.0); }
+
+.landing__cta-arrow {
+  display: inline-flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+.landing__cta:hover .landing__cta-arrow { transform: translateX(4px); }
+
+/* ═══ Stats row ════════════════════════════════════════════════════════════════ */
+.landing__stats {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.landing__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+}
+
+.landing__stat-value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #DFDFE0;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.landing__stat-label {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: #6E7788;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.landing__stat-sep {
+  width: 1px;
+  height: 32px;
+  background: rgba(110,119,136,0.2);
+  flex-shrink: 0;
+}
+
+/* ═══ Lottie side ══════════════════════════════════════════════════════════════ */
+
+/* Corner bracket decorations */
+.landing__right-frame {
+  position: relative;
+  width: min(500px, 100%);
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.landing__right-frame::before,
+.landing__right-frame::after {
+  content: '';
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border-color: rgba(58,159,216,0.4);
+  border-style: solid;
+}
+.landing__right-frame::before {
+  top: 0; left: 0;
+  border-width: 2px 0 0 2px;
+}
+.landing__right-frame::after {
+  bottom: 0; right: 0;
+  border-width: 0 2px 2px 0;
+}
+
+/* Inner brackets via a child element */
+.landing__right-frame-inner {
+  position: absolute;
+  inset: 0;
+}
+.landing__right-frame-inner::before,
+.landing__right-frame-inner::after {
+  content: '';
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border-color: rgba(58,159,216,0.25);
+  border-style: solid;
+}
+.landing__right-frame-inner::before {
+  top: 0; right: 0;
+  border-width: 2px 2px 0 0;
+}
+.landing__right-frame-inner::after {
+  bottom: 0; left: 0;
+  border-width: 0 0 2px 2px;
+}
+
+.landing__lottie {
+  width: 90%;
+  height: 90%;
+  filter: drop-shadow(0 0 50px rgba(9,64,116,0.5)) drop-shadow(0 0 100px rgba(58,159,216,0.15));
+  animation: lottieFloat 7s ease-in-out infinite;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes lottieFloat {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-14px); }
+}
+
+/* Rotating ring behind the animation */
+.landing__ring {
+  position: absolute;
+  width: 85%;
+  height: 85%;
+  border-radius: 50%;
+  border: 1px solid rgba(58,159,216,0.12);
+  animation: ringRotate 30s linear infinite;
+}
+
+.landing__ring::before {
+  content: '';
+  position: absolute;
+  top: -3px; left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(58,159,216,0.6);
+  box-shadow: 0 0 12px rgba(58,159,216,0.8);
+  transform: translateX(-50%);
+}
+
+@keyframes ringRotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.landing__ring--2 {
+  width: 95%;
+  height: 95%;
+  border-color: rgba(110,119,136,0.08);
+  animation: ringRotate 50s linear infinite reverse;
+}
+
+/* ═══ HUD labels — floating data points ════════════════════════════════════════ */
+.landing__hud {
+  position: absolute;
+  font-family: 'Inter', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(58,159,216,0.5);
+  pointer-events: none;
+  animation: hudBlink 3s ease-in-out infinite;
+}
+
+.landing__hud--tl { top: 12%; left: 2%; }
+.landing__hud--br { bottom: 12%; right: 2%; animation-delay: 1.5s; }
+
+@keyframes hudBlink {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 0.9; }
+}
+
+/* ═══ Scroll hint ══════════════════════════════════════════════════════════════ */
+.landing__scroll {
+  position: absolute;
+  bottom: 1.75rem;
+  left: 6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  opacity: 0.35;
+  z-index: 2;
+  animation: fadeIn 2s ease 2s both;
+}
+
+.landing__scroll-line {
+  width: 40px;
+  height: 1px;
+  background: linear-gradient(to right, #6E7788, transparent);
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.35; transform: scaleX(1); }
+  50%       { opacity: 0.9; transform: scaleX(1.1); }
+}
+
+.landing__scroll-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #6E7788;
+}
+
+/* ═══ Shared keyframes ═════════════════════════════════════════════════════════ */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 0.35; }
+}
+
+/* ═══ Responsive — mobile: stack vertically ═════════════════════════════════════ */
+@media (max-width: 900px) {
+  .landing__bg-right {
+    clip-path: none;
+    background: linear-gradient(180deg, #001233 0%, #094074 60%, #37455E 100%);
+  }
+  .landing__seam { display: none; }
+  .landing__grid::before { clip-path: none; }
+  .landing__grid::after  { clip-path: none; }
+
+  .landing__body {
+    flex-direction: column;
+    align-items: center;
+    padding-top: 4.5rem;
+  }
+
+  .landing__left {
+    flex: none;
+    align-items: center;
+    text-align: center;
+    padding: 3rem 1.5rem 1rem;
+    order: 2;
+  }
+
+  .landing__right {
+    flex: none;
+    width: 100%;
+    order: 1;
+    padding: 2rem 1.5rem 0;
+  }
+
+  .landing__right-frame {
+    width: min(320px, 85vw);
+  }
+
+  .landing__headline { font-size: clamp(2.4rem, 9vw, 3.5rem); }
+  .landing__desc { max-width: 100%; }
+  .landing__cta-group { align-items: center; }
+  .landing__stat { align-items: center; }
+  .landing__scroll { left: 50%; transform: translateX(-50%); }
+  .landing__hud { display: none; }
+
+  .landing__nav { padding: 1rem 1.25rem; }
+}
