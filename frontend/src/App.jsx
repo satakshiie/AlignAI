@@ -35,11 +35,7 @@ export default function App() {
   }
 
   if (screen === SCREENS.UPLOAD) {
-    return (
-      <div style={{ minHeight: '100vh', background: '#001233', padding: '5rem 2rem 2rem' }}>
-        <UploadScreen onComplete={handleUploadComplete} />
-      </div>
-    );
+    return <UploadScreen onComplete={handleUploadComplete} />;
   }
 
   if (screen === SCREENS.SCORE) {

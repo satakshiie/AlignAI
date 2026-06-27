@@ -7,7 +7,7 @@ from services.extraction_service import extract_text
 from services.deterministic_extraction_service import extract_deterministic_fields, categorize_links
 from services.llm_extraction_service import extract_resume_data, extract_jd_data
 from services.storage_service import save_document_and_context
-from services.doc_type_heuristic import guess_doc_type, DocTypeGuess
+from services.doc_type_heuristic import guess_doc_type, has_minimal_document_signal, DocTypeGuess , is_substantial_document
 
 router = APIRouter(prefix="/api", tags=["upload"])
 
@@ -23,11 +23,20 @@ async def upload_document(
     extraction_result = extract_text(result["content"])
     if not extraction_result["success"]:
         raise HTTPException(status_code=422, detail=extraction_result["error"])
+    
+    if not is_substantial_document(extraction_result["text"]):
+        raise HTTPException(
+        status_code=400,
+        detail="This document is too short to be a resume or job description. Please check the file and try again."
+    )
+    
+    if not has_minimal_document_signal(extraction_result["text"]):
+        raise HTTPException(
+        status_code=400,
+        detail="This document doesn't appear to be a resume or job description. Please check the file and try again."
+    )
 
-    # --- Content-based doc_type mismatch check ---
-    # Runs immediately after text extraction, before any LLM/deterministic work,
-    # so it costs nothing extra. UNDETECTED means the heuristic wasn't confident
-    # enough to block — we let those through rather than risk false positives.
+   
     guessed_type = guess_doc_type(extraction_result["text"])
     if guessed_type != DocTypeGuess.UNDETECTED:
         if doc_type == DocType.resume and guessed_type == DocTypeGuess.JD:
