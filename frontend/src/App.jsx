@@ -40,13 +40,11 @@ export default function App() {
 
   if (screen === SCREENS.SCORE) {
     return (
-      <div style={{ minHeight: '100vh', background: '#001233', padding: '5rem 2rem 2rem' }}>
-        <ScoreScreen
-          resumeDocumentId={documentIds.resumeDocumentId}
-          jdDocumentId={documentIds.jdDocumentId}
-          onContinue={handleScoreContinue}
-        />
-      </div>
+      <ScoreScreen
+        resumeDocumentId={documentIds.resumeDocumentId}
+        jdDocumentId={documentIds.jdDocumentId}
+        onContinue={handleScoreContinue}
+      />
     );
   }
 
